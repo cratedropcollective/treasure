@@ -225,7 +225,7 @@
     }
     .hidden { display: none !important; }
 
-  </script>
+  </style>
 </head>
 <body>
 
@@ -234,14 +234,12 @@
   <div class="dashboard" id="dashboard">
     <h2>Secure Supply Drop</h2>
     
-    <!-- The Pack Graphic -->
     <div class="pack-container" id="pack-container">
       <div class="pack" id="visual-pack">
         <div class="pack-logo">CRATE</div>
       </div>
     </div>
 
-    <!-- The Reward Reveal -->
     <div class="reward-area" id="reward-area">
       <h3 style="margin:0; color:#fff;">Target Decrypted!</h3>
       <img id="reward-img" class="reward-image" src="" alt="Reward Image">
@@ -250,7 +248,6 @@
       <button style="margin-top: 10px; width: 100%;" onclick="location.reload()">Scan Another Code</button>
     </div>
 
-    <!-- Input Form -->
     <div class="input-group" id="input-group">
       <input type="text" id="passcodeInput" placeholder="ENTER TRANSMISSION CODE" autocomplete="off" spellcheck="false">
       <button id="unlockBtn" onclick="processDecrypt()">Decrypt Pack</button>
