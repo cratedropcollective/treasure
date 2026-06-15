@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encrypted Drop - Crate Drop</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #1e1e1e;
+      padding: 40px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 12px;
+      margin: 20px 0;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #fff;
+      font-size: 18px;
+      text-align: center;
+      text-transform: uppercase;
+      border-radius: 4px;
+    }
+    button {
+      background: #d32f2f;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover { background: #b71c1c; }
+    button:disabled { background: #555; cursor: not-allowed; }
+    #resultMessage { margin-top: 20px; font-weight: bold; min-height: 24px;}
+    .success { color: #4caf50; }
+    .error { color: #f44336; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Encrypted Crate Drop</h2>
+    <p>Enter your transmission code to unlock the sealed pack.</p>
+    
+    <input type="text" id="passcodeInput" placeholder="ENTER CODE" autocomplete="off">
+    <br>
+    <button id="unlockBtn" onclick="checkCode()">Decrypt</button>
+    
+    <div id="resultMessage"></div>
+  </div>
+
+  <script>
+    // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT URL HERE
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywuiVPzsb-R64Q9dfcmjfZ50_0l8_rta_3ERPjjW0YCN0YFRtPSTqSdBa2P0sv6eCf/exec";
+
+    async function checkCode() {
+      const codeInput = document.getElementById('passcodeInput').value.trim();
+      const resultDiv = document.getElementById('resultMessage');
+      const btn = document.getElementById('unlockBtn');
+
+      if (!codeInput) {
+        resultDiv.textContent = "Please enter a code.";
+        resultDiv.className = "error";
+        return;
+      }
+
+      // UI updates while fetching
+      btn.disabled = true;
+      btn.textContent = "Decrypting...";
+      resultDiv.textContent = "";
+
+      try {
+        // Append the code to the URL as a query parameter
+        const response = await fetch(`${APPS_SCRIPT_URL}?code=${encodeURIComponent(codeInput)}`);
+        const data = await response.json();
+
+        if (data.status === "success") {
+          resultDiv.innerHTML = `Pack Decrypted! <br><br> Reward: <strong>${data.reward}</strong><br><br>Screenshot this and message us to claim.`;
+          resultDiv.className = "success";
+        } else {
+          resultDiv.textContent = data.message;
+          resultDiv.className = "error";
+        }
+      } catch (error) {
+        resultDiv.textContent = "Signal lost. Try again later.";
+        resultDiv.className = "error";
+      } finally {
+        // Restore button state
+        btn.disabled = false;
+        btn.textContent = "Decrypt";
+      }
+    }
+  </script>
+</body>
+</html>
