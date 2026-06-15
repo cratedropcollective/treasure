@@ -3,112 +3,417 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Encrypted Drop - Crate Drop</title>
+  <title>Crate Drop - Encrypted Pack</title>
   <style>
+    :root {
+      --primary: #00ffcc;
+      --bg-color: #0d0e15;
+      --surface: #1a1c29;
+      --error: #ff3366;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #121212;
-      color: #e0e0e0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
     }
-    .container {
-      background: #1e1e1e;
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .dashboard {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
       padding: 40px;
-      border-radius: 8px;
-      border: 1px solid #333;
-      text-align: center;
-      max-width: 400px;
       width: 90%;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      max-width: 450px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 10;
     }
+
+    h2 {
+      margin-top: 0;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* The Pack Graphic */
+    .pack-container {
+      perspective: 1000px;
+      margin: 30px auto;
+      width: 200px;
+      height: 280px;
+      position: relative;
+    }
+
+    .pack {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #2b2e4a, #1a1c29, #2b2e4a);
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 255, 204, 0.2);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: float 4s ease-in-out infinite;
+      transition: all 0.3s ease;
+    }
+
+    /* Holographic shine effect */
+    .pack::after {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(45deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 60%);
+      animation: holo 3s linear infinite;
+    }
+
+    .pack-logo {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.8);
+      transform: rotate(-15deg);
+      border: 2px solid rgba(255,255,255,0.5);
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    /* Input & Button */
+    .input-group {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
     input[type="text"] {
-      width: 80%;
-      padding: 12px;
-      margin: 20px 0;
-      background: #2a2a2a;
-      border: 1px solid #444;
-      color: #fff;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--primary);
+      padding: 15px;
       font-size: 18px;
       text-align: center;
       text-transform: uppercase;
-      border-radius: 4px;
+      border-radius: 8px;
+      outline: none;
+      transition: border 0.3s, box-shadow 0.3s;
+      letter-spacing: 2px;
     }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+    }
+
     button {
-      background: #d32f2f;
-      color: white;
+      background: var(--primary);
+      color: #000;
       border: none;
-      padding: 12px 24px;
+      padding: 15px;
       font-size: 16px;
-      cursor: pointer;
-      border-radius: 4px;
       font-weight: bold;
-      transition: background 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
     }
-    button:hover { background: #b71c1c; }
-    button:disabled { background: #555; cursor: not-allowed; }
-    #resultMessage { margin-top: 20px; font-weight: bold; min-height: 24px;}
-    .success { color: #4caf50; }
-    .error { color: #f44336; }
-  </style>
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+    }
+
+    button:disabled {
+      background: #444;
+      color: #888;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Reward Reveal Area (Hidden Initially) */
+    .reward-area {
+      display: none;
+      animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .reward-image {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+      margin: 20px 0;
+      display: none;
+    }
+
+    .reward-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(0, 255, 204, 0.1);
+      border: 1px dashed var(--primary);
+      border-radius: 8px;
+      display: none;
+    }
+
+    #status-msg { margin-top: 15px; font-size: 14px; min-height: 20px; }
+    .error { color: var(--error); }
+    .info { color: #aaa; }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    @keyframes holo {
+      0% { left: -100%; top: -100%; }
+      100% { left: 100%; top: 100%; }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0) scale(1.05); }
+      25% { transform: translateX(-5px) rotate(-2deg) scale(1.05); }
+      50% { transform: translateX(5px) rotate(2deg) scale(1.05); }
+      75% { transform: translateX(-5px) rotate(-2deg) scale(1.05); }
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.5); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* States added via JS */
+    .pack.unlocking {
+      animation: shake 0.4s infinite;
+      box-shadow: 0 0 40px var(--primary);
+      border-color: var(--primary);
+    }
+    .pack.error-shake {
+      animation: shake 0.4s 2;
+      box-shadow: 0 0 30px var(--error);
+      border-color: var(--error);
+    }
+    .hidden { display: none !important; }
+
+  </script>
 </head>
 <body>
 
-  <div class="container">
-    <h2>Encrypted Crate Drop</h2>
-    <p>Enter your transmission code to unlock the sealed pack.</p>
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="dashboard" id="dashboard">
+    <h2>Secure Supply Drop</h2>
     
-    <input type="text" id="passcodeInput" placeholder="ENTER CODE" autocomplete="off">
-    <br>
-    <button id="unlockBtn" onclick="checkCode()">Decrypt</button>
-    
-    <div id="resultMessage"></div>
+    <!-- The Pack Graphic -->
+    <div class="pack-container" id="pack-container">
+      <div class="pack" id="visual-pack">
+        <div class="pack-logo">CRATE</div>
+      </div>
+    </div>
+
+    <!-- The Reward Reveal -->
+    <div class="reward-area" id="reward-area">
+      <h3 style="margin:0; color:#fff;">Target Decrypted!</h3>
+      <img id="reward-img" class="reward-image" src="" alt="Reward Image">
+      <div id="reward-txt" class="reward-text"></div>
+      <p style="font-size:12px; color:#aaa;">Screenshot this and claim your drop.</p>
+      <button style="margin-top: 10px; width: 100%;" onclick="location.reload()">Scan Another Code</button>
+    </div>
+
+    <!-- Input Form -->
+    <div class="input-group" id="input-group">
+      <input type="text" id="passcodeInput" placeholder="ENTER TRANSMISSION CODE" autocomplete="off" spellcheck="false">
+      <button id="unlockBtn" onclick="processDecrypt()">Decrypt Pack</button>
+      <div id="status-msg" class="info">Awaiting code input...</div>
+    </div>
   </div>
 
   <script>
+    // ==========================================
+    // 1. CONFIGURATION
+    // ==========================================
     // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT URL HERE
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywuiVPzsb-R64Q9dfcmjfZ50_0l8_rta_3ERPjjW0YCN0YFRtPSTqSdBa2P0sv6eCf/exec";
 
-    async function checkCode() {
+    // ==========================================
+    // 2. MAIN LOGIC
+    // ==========================================
+    async function processDecrypt() {
       const codeInput = document.getElementById('passcodeInput').value.trim();
-      const resultDiv = document.getElementById('resultMessage');
       const btn = document.getElementById('unlockBtn');
+      const pack = document.getElementById('visual-pack');
+      const statusMsg = document.getElementById('status-msg');
 
       if (!codeInput) {
-        resultDiv.textContent = "Please enter a code.";
-        resultDiv.className = "error";
+        triggerError("Enter a transmission code.");
         return;
       }
 
-      // UI updates while fetching
+      // UI State: Unlocking
       btn.disabled = true;
-      btn.textContent = "Decrypting...";
-      resultDiv.textContent = "";
+      btn.textContent = "DECRYPTING SIGNAL...";
+      statusMsg.className = "info";
+      statusMsg.textContent = "Connecting to secure server...";
+      
+      // Stop floating, start shaking/glowing
+      pack.style.animation = 'none'; 
+      // Trigger reflow
+      void pack.offsetWidth; 
+      pack.classList.add('unlocking');
+
+      // Add artificial delay for suspense/animation impact
+      const minimumDelay = new Promise(resolve => setTimeout(resolve, 2000));
 
       try {
-        // Append the code to the URL as a query parameter
-        const response = await fetch(`${APPS_SCRIPT_URL}?code=${encodeURIComponent(codeInput)}`);
-        const data = await response.json();
+        // Fetch from Apps Script
+        const fetchPromise = fetch(`${APPS_SCRIPT_URL}?code=${encodeURIComponent(codeInput)}`).then(res => res.json());
+        
+        // Wait for both the minimum delay (suspense) and the actual fetch to finish
+        const [_, data] = await Promise.all([minimumDelay, fetchPromise]);
 
         if (data.status === "success") {
-          resultDiv.innerHTML = `Pack Decrypted! <br><br> Reward: <strong>${data.reward}</strong><br><br>Screenshot this and message us to claim.`;
-          resultDiv.className = "success";
+          showSuccess(data.reward);
         } else {
-          resultDiv.textContent = data.message;
-          resultDiv.className = "error";
+          triggerError(data.message || "Invalid or already claimed code.");
         }
       } catch (error) {
-        resultDiv.textContent = "Signal lost. Try again later.";
-        resultDiv.className = "error";
-      } finally {
-        // Restore button state
-        btn.disabled = false;
-        btn.textContent = "Decrypt";
+        console.error(error);
+        triggerError("Signal lost. Check connection or try again.");
       }
     }
+
+    function triggerError(message) {
+      const btn = document.getElementById('unlockBtn');
+      const pack = document.getElementById('visual-pack');
+      const statusMsg = document.getElementById('status-msg');
+
+      pack.classList.remove('unlocking');
+      pack.classList.add('error-shake');
+      
+      statusMsg.textContent = message;
+      statusMsg.className = "error";
+      
+      btn.disabled = false;
+      btn.textContent = "DECRYPT PACK";
+
+      // Reset pack animation to float after error shakes
+      setTimeout(() => {
+        pack.classList.remove('error-shake');
+        pack.style.animation = 'float 4s ease-in-out infinite';
+      }, 800);
+    }
+
+    function showSuccess(rewardData) {
+      document.getElementById('pack-container').classList.add('hidden');
+      document.getElementById('input-group').classList.add('hidden');
+      
+      const rewardArea = document.getElementById('reward-area');
+      rewardArea.style.display = 'block';
+
+      // Check if the reward is a URL (Image) or standard Text
+      const isImage = rewardData.startsWith('http://') || rewardData.startsWith('https://');
+
+      if (isImage) {
+        const imgEl = document.getElementById('reward-img');
+        imgEl.src = rewardData;
+        imgEl.style.display = 'block';
+      } else {
+        const txtEl = document.getElementById('reward-txt');
+        txtEl.innerHTML = rewardData;
+        txtEl.style.display = 'block';
+      }
+
+      fireConfetti();
+    }
+
+    // ==========================================
+    // 3. CONFETTI PARTICLE ENGINE
+    // ==========================================
+    function fireConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#00ffcc', '#ff3366', '#ffffff', '#0099ff'];
+
+      for (let i = 0; i < 150; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2 + 100,
+          r: Math.random() * 6 + 2,
+          dx: Math.random() * 20 - 10,
+          dy: Math.random() * -20 - 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          tilt: Math.floor(Math.random() * 10) - 10,
+          tiltAngleIncrement: (Math.random() * 0.07) + 0.05,
+          tiltAngle: 0
+        });
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach((p, index) => {
+          p.tiltAngle += p.tiltAngleIncrement;
+          p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
+          p.x += Math.sin(p.tiltAngle) * 2;
+          p.dy += 0.2; // gravity
+          p.y += p.dy;
+          p.x += p.dx;
+
+          ctx.beginPath();
+          ctx.lineWidth = p.r;
+          ctx.strokeStyle = p.color;
+          ctx.moveTo(p.x + p.tilt + p.r, p.y);
+          ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+          ctx.stroke();
+
+          // Remove particles that fall off screen
+          if (p.y > canvas.height) particles.splice(index, 1);
+        });
+      }
+      animate();
+    }
+
+    // Handle window resize for confetti canvas
+    window.addEventListener('resize', () => {
+      const canvas = document.getElementById('confetti-canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
   </script>
 </body>
 </html>
