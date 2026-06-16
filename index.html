@@ -272,15 +272,15 @@
       const statusMsg = document.getElementById('status-msg');
 
       if (!codeInput) {
-        triggerError("Enter a transmission code.");
+        triggerError("NOPE");
         return;
       }
 
       // UI State: Unlocking
       btn.disabled = true;
-      btn.textContent = "DECRYPTING SIGNAL...";
+      btn.textContent = "SECURING DROP...";
       statusMsg.className = "info";
-      statusMsg.textContent = "Connecting to secure server...";
+      statusMsg.textContent = "Stay on this screen...";
       
       // Stop floating, start shaking/glowing
       pack.style.animation = 'none'; 
@@ -321,7 +321,7 @@
       statusMsg.className = "error";
       
       btn.disabled = false;
-      btn.textContent = "DECRYPT PACK";
+      btn.textContent = "TRY YOUR LUCK";
 
       // Reset pack animation to float after error shakes
       setTimeout(() => {
