@@ -86,10 +86,52 @@
     
     /* BOOSTER PACK PULLER STYLES */
     .booster-container {
-      margin: 20px auto;
-      width: 140px;
-      height: 220px;
+      margin: 30px auto;
+      width: 160px;
+      height: 240px;
       perspective: 1000px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .pack-counter-display {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: 2px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      background: rgba(0, 245, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      border: 1px solid rgba(0, 245, 255, 0.2);
+    }
+
+    /* The actual card that slides out */
+    .pulled-card {
+      position: absolute;
+      top: 15px; left: 10px; right: 10px; bottom: 15px;
+      background: #1a1c29;
+      border-radius: 10px;
+      border: 2px solid #333;
+      z-index: 1;
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transform: translateY(0) scale(0.9);
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+    
+    .pulled-card-text {
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 2px;
+      transform: rotate(-5deg);
     }
 
     .booster-pack {
@@ -102,54 +144,54 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.3);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.3);
       animation: floatBooster 3s ease-in-out infinite;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
       border-top: 14px solid #1f2937; 
       border-bottom: 14px solid #1f2937; 
+      z-index: 2;
     }
 
     /* Crimped edges */
-    .booster-pack::before {
-      content: ''; position: absolute; top: -14px; left: 0; right: 0; height: 14px;
+    .booster-pack::before, .booster-pack::after {
+      content: ''; position: absolute; left: 0; right: 0; height: 14px;
       background: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px);
     }
-    .booster-pack::after {
-      content: ''; position: absolute; bottom: -14px; left: 0; right: 0; height: 14px;
-      background: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px);
-    }
+    .booster-pack::before { top: -14px; }
+    .booster-pack::after { bottom: -14px; }
 
     .booster-foil {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.7) 25%, transparent 30%);
+      position: absolute; inset: 0;
+      background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.8) 25%, transparent 30%);
       background-size: 200% 200%;
       animation: foilShine 2.5s linear infinite;
       mix-blend-mode: overlay;
       pointer-events: none;
     }
 
-    .booster-label {
-      background: #000;
-      color: var(--primary);
-      padding: 8px 16px;
-      font-weight: 900;
-      font-size: 13px;
-      letter-spacing: 4px;
-      border: 1px solid var(--primary);
-      transform: rotate(-6deg);
-      box-shadow: 0 0 15px rgba(0,245,255,0.4);
-      z-index: 2;
+    .booster-logo {
+      width: 85%;
+      max-width: 120px;
+      z-index: 3;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+      pointer-events: none;
     }
 
-    /* Tearing Animations */
-    .booster-pack.tearing {
-      animation: packShake 0.12s infinite;
-      filter: brightness(1.4);
+    /* Animation States */
+    .booster-container.tearing .booster-pack {
+      animation: packShake 0.1s infinite;
+      filter: brightness(1.3);
     }
-    .booster-pack.opened {
-      transform: scale(0.5) translateY(-50px);
-      opacity: 0;
+    
+    .booster-container.revealing .booster-pack {
+      transform: translateY(80px) rotate(5deg) scale(0.8);
+      opacity: 0; /* Pack falls away */
+    }
+
+    .booster-container.revealing .pulled-card {
+      opacity: 1;
+      transform: translateY(-40px) scale(1.1);
+      z-index: 3;
     }
 
     .pulled-code-display {
@@ -161,7 +203,7 @@
       font-size: 18px;
       letter-spacing: 2px;
       margin: 20px 0;
-      min-height: 60px;
+      min-height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -170,6 +212,7 @@
     }
 
     .rarity-label { font-size: 10px; font-weight: 900; letter-spacing: 3px; margin-bottom: 5px; }
+    .disclaimer-text { font-size: 9px; color: rgba(255,255,255,0.5); margin-top: 10px; line-height: 1.3; font-family: sans-serif; letter-spacing: 0.5px; text-transform: none; max-width: 90%; }
 
     /* PACK UNLOCKER STYLES */
     .pack-container { perspective: 1200px; margin: 40px auto; width: 210px; height: 300px; position: relative; }
@@ -206,7 +249,7 @@
 
     @keyframes floatBooster { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     @keyframes foilShine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    @keyframes packShake { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-4px) rotate(-3deg); } 75% { transform: translateX(4px) rotate(3deg); } }
+    @keyframes packShake { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-6px) rotate(-4deg); } 75% { transform: translateX(6px) rotate(4deg); } }
     @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
     @keyframes pulseGlow { 0%, 100% { width: 150px; opacity: 0.7; } 50% { width: 180px; opacity: 1; } }
     @keyframes holoStream { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
@@ -241,12 +284,17 @@
     
     <div class="dashboard" id="interceptor-dashboard">
       <h2>Access Code Booster</h2>
-      <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:10px;">Rip open a foil pack to find an access code. Low pull rates for Legendary.</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:10px; margin-bottom: 20px;">Rip open a pack to find an access code. Low pull rates for Legendary.</p>
       
+      <div class="pack-counter-display" id="pack-counter">Packs Opened: 0</div>
+
       <div class="booster-container" id="booster-container" onclick="simulatePull()">
+        <div class="pulled-card" id="pulled-card">
+           <div class="pulled-card-text" id="card-rarity-text"></div>
+        </div>
         <div class="booster-pack" id="booster">
           <div class="booster-foil"></div>
-          <div class="booster-label">DATA PACK</div>
+          <img src="https://www.image2url.com/r2/default/images/1781591852305-4a685090-2274-47d0-83af-16ea98860a4a.png" alt="CDC Logo" class="booster-logo">
         </div>
       </div>
 
@@ -297,6 +345,7 @@
     // ==========================================
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPYiqTxKhodo-2K3UHq-4b7k6HER_FeVNrz_DjNWa5UV_OvwHtjy57vZthWHoLPmw8/exec";
     let isPulling = false;
+    let packsOpened = 0;
 
     // ==========================================
     // 2. GACHA SIMULATOR (Booster Puller)
@@ -306,30 +355,40 @@
       isPulling = true;
 
       const pullBtn = document.getElementById('pullBtn');
-      const booster = document.getElementById('booster');
+      const container = document.getElementById('booster-container');
       const display = document.getElementById('code-display');
+      const card = document.getElementById('pulled-card');
+      const cardText = document.getElementById('card-rarity-text');
+
+      // Reset states if pulling again
+      container.classList.remove('revealing');
+      void container.offsetWidth; // Force reflow to restart animations cleanly
+
+      // Increment Counter
+      packsOpened++;
+      document.getElementById('pack-counter').textContent = `Packs Opened: ${packsOpened}`;
 
       // UI Tearing state
       pullBtn.disabled = true;
       pullBtn.textContent = "RIPPING FOIL...";
-      booster.classList.add('tearing');
+      container.classList.add('tearing');
       
       display.innerHTML = '<span style="color: var(--primary); animation: pulse 1s infinite;">EXTRACTING...</span>';
       display.style.borderColor = 'var(--primary)';
       display.style.boxShadow = '0 0 15px rgba(0, 245, 255, 0.2)';
 
       // Fake delay for suspense
-      await new Promise(r => setTimeout(r, 1800));
+      await new Promise(r => setTimeout(r, 1500));
 
-      // Pack burst
-      booster.classList.remove('tearing');
-      booster.classList.add('opened');
+      // Pack burst / Card Reveal
+      container.classList.remove('tearing');
+      container.classList.add('revealing');
 
       // RNG LOGIC
       const roll = Math.random() * 100; 
       
       let rarity = "COMMON";
-      let code = "RIP_ANOTHER_PACK";
+      let code = "NO_PULL";
       let color = "#525875";
 
       if (roll < 0.1) {
@@ -346,11 +405,18 @@
         color = "var(--primary)";
       } else {
         rarity = "COMMON";
-        code = "RIP_ANOTHER_PACK";
+        code = "ACCESS_DENIED";
         color = "rgba(255,255,255,0.4)";
       }
 
-      // Reset UI and show result
+      // Update the pulled card visual
+      card.style.borderColor = color;
+      card.style.background = `linear-gradient(135deg, #1a1c29 0%, ${color}30 100%)`;
+      card.style.boxShadow = `0 0 30px ${color}60`;
+      cardText.textContent = rarity;
+      cardText.style.color = color;
+
+      // Update UI and show result
       display.style.borderColor = color;
       display.style.boxShadow = `0 0 20px ${color}40`;
       
@@ -364,17 +430,15 @@
           <div class="rarity-label" style="color: ${color}">${rarity} PULL!</div>
           <div style="color: #fff; font-weight: 900; user-select: all; cursor: pointer;" onclick="copyToUnlocker('${code}')">${code}</div>
           <div style="font-size: 10px; color: ${color}; margin-top: 5px;">Click code to copy to terminal</div>
+          <div class="disclaimer-text">Disclaimer: This code will no longer work once all available redemptions have been claimed.</div>
         `;
         if (rarity === "LEGENDARY" || rarity === "EPIC") fireConfetti(color);
       }
 
-      // Allow pulling again after a short delay, restore the pack visually
-      setTimeout(() => {
-        pullBtn.disabled = false;
-        pullBtn.textContent = "CRACK ANOTHER";
-        booster.classList.remove('opened');
-        isPulling = false;
-      }, 1200);
+      // Reset button but leave the card visible until next click
+      pullBtn.disabled = false;
+      pullBtn.textContent = "CRACK ANOTHER";
+      isPulling = false;
     }
 
     function copyToUnlocker(code) {
