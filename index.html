@@ -8,10 +8,9 @@
   <style>
     :root {
       --primary: #00f5ff;
-      --accent: #ffb703;
-      --epic: #d946ef;
-      --legendary: #ffb703;
-      --rare: #00f5ff;
+      --secret-rare: #ff2d6b;
+      --ultra-rare: #d946ef;
+      --super-rare: #00f5ff;
       --bg: #06070d;
       --surface: #0e1018;
       --surface2: #13161f;
@@ -222,10 +221,10 @@
     .pull-result.state-loading .result-label { color: var(--primary); animation: pulseText 1s ease-in-out infinite; }
     @keyframes pulseText { 0%,100%{opacity:1} 50%{opacity:0.4} }
     .pull-result.state-dud .result-label { color: rgba(255,255,255,0.35); }
-    .pull-result.state-rare { border-color: rgba(0,245,255,0.4); box-shadow: 0 0 20px rgba(0,245,255,0.1); }
-    .pull-result.state-epic { border-color: rgba(217,70,239,0.5); box-shadow: 0 0 24px rgba(217,70,239,0.15); }
-    .pull-result.state-legendary { border-color: rgba(255,183,3,0.5); box-shadow: 0 0 28px rgba(255,183,3,0.2); animation: legendaryPulse 2s ease-in-out infinite; }
-    @keyframes legendaryPulse { 0%,100%{box-shadow:0 0 28px rgba(255,183,3,0.2)} 50%{box-shadow:0 0 45px rgba(255,183,3,0.4)} }
+    .pull-result.state-super-rare { border-color: rgba(0,245,255,0.4); box-shadow: 0 0 20px rgba(0,245,255,0.1); }
+    .pull-result.state-ultra-rare { border-color: rgba(217,70,239,0.5); box-shadow: 0 0 28px rgba(217,70,239,0.18); }
+    .pull-result.state-secret-rare { border-color: rgba(255,45,107,0.6); box-shadow: 0 0 35px rgba(255,45,107,0.25); animation: secretPulse 1.8s ease-in-out infinite; }
+    @keyframes secretPulse { 0%,100%{box-shadow:0 0 35px rgba(255,45,107,0.25)} 50%{box-shadow:0 0 55px rgba(255,45,107,0.5)} }
 
     /* Rarity flash */
     .rarity-flash {
@@ -243,10 +242,10 @@
       cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
     }
     .copy-btn:hover { background: rgba(0,245,255,0.18); }
-    .copy-btn.epic-style { border-color: rgba(217,70,239,0.35); color: var(--epic); background: rgba(217,70,239,0.08); }
-    .copy-btn.epic-style:hover { background: rgba(217,70,239,0.16); }
-    .copy-btn.legendary-style { border-color: rgba(255,183,3,0.4); color: var(--accent); background: rgba(255,183,3,0.08); }
-    .copy-btn.legendary-style:hover { background: rgba(255,183,3,0.16); }
+    .copy-btn.ultra-rare-style { border-color: rgba(217,70,239,0.35); color: var(--ultra-rare); background: rgba(217,70,239,0.08); }
+    .copy-btn.ultra-rare-style:hover { background: rgba(217,70,239,0.16); }
+    .copy-btn.secret-rare-style { border-color: rgba(255,45,107,0.4); color: var(--secret-rare); background: rgba(255,45,107,0.08); }
+    .copy-btn.secret-rare-style:hover { background: rgba(255,45,107,0.16); }
 
     .pull-cta {
       background: linear-gradient(135deg, rgba(0,245,255,0.9), rgba(0,191,255,0.9));
@@ -450,7 +449,7 @@
             </div>
           </div>
           <button class="pull-cta pack-stage-btn" id="pull-btn" onclick="simulatePull()">Crack Pack (Free)</button>
-          <div class="disclaimer">Pull rates — Common: ~94% / Rare: 5% / Epic: 1% / Legendary: 0.1%<br>Codes expire when redemptions run out.</div>
+          <div class="disclaimer">Pull rates — Common: 98.4% / Super Rare: 1% (10 uses) / Ultra Rare: 0.5% (1 use) / Secret Rare: 0.1% (1 use)<br>Codes are server-issued. Each code expires once its redemption limit is hit.</div>
         </div>
 
         <!-- Results -->
@@ -528,7 +527,8 @@
 
   <script>
     // ── CONFIG ──
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPYiqTxKhodo-2K3UHq-4b7k6HER_FeVNrz_DjNWa5UV_OvwHtjy57vZthWHoLPmw8/exec";
+    // ── Replace both URLs with your deployed Apps Script URL ──
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEU51oaa6w5afYnKOOnk67rf2URcC8ldg0-NRtZ2c3bidvJOQVJEPQmqw1wbkbkmMZDQ/exec";
 
     // ── STATE ──
     let isPulling = false;
@@ -548,76 +548,87 @@
       if (n > 2) document.getElementById('connector-2-3').classList.add('done');
     }
 
+    // ── RARITY COLOURS ──
+    const RARITY_STYLES = {
+      'SECRET RARE': { color: '#ff2d6b', stateClass: 'state-secret-rare', btnClass: 'secret-rare-style' },
+      'ULTRA RARE':  { color: '#d946ef', stateClass: 'state-ultra-rare',  btnClass: 'ultra-rare-style'  },
+      'SUPER RARE':  { color: '#00f5ff', stateClass: 'state-super-rare',  btnClass: ''                  },
+      'COMMON':      { color: 'rgba(255,255,255,0.3)', stateClass: 'state-dud', btnClass: '' }
+    };
+
     // ── BOOSTER PULL ──
     async function simulatePull() {
       if (isPulling) return;
       isPulling = true;
 
-      const wrap = document.getElementById('booster-wrap');
-      const packEl = document.getElementById('booster-pack-el');
-      const pullBtn = document.getElementById('pull-btn');
-      const pullResult = document.getElementById('pull-result');
-      const revealCard = document.getElementById('reveal-card');
+      const wrap         = document.getElementById('booster-wrap');
+      const packEl       = document.getElementById('booster-pack-el');
+      const pullBtn      = document.getElementById('pull-btn');
+      const pullResult   = document.getElementById('pull-result');
+      const revealCard   = document.getElementById('reveal-card');
       const revealRarity = document.getElementById('reveal-rarity');
-      const revealCodeText = document.getElementById('reveal-code-text');
+      const revealCode   = document.getElementById('reveal-code-text');
 
       try {
-        // ── RESET: fully restore pack to visible resting state ──
+        // ── RESET ──
         revealCard.classList.remove('visible');
         wrap.classList.remove('tearing');
-
-        // Kill ALL inline styles on packEl so CSS animation takes over cleanly
         packEl.removeAttribute('style');
-        void packEl.offsetWidth; // force reflow
-
-        // Restart the float animation
+        void packEl.offsetWidth;
         packEl.style.animation = 'none';
         void packEl.offsetWidth;
         packEl.style.animation = '';
 
-        // ── COUNTER ──
         packsOpened++;
         document.getElementById('packs-opened-count').textContent = packsOpened;
-
         pullBtn.disabled = true;
         pullBtn.textContent = 'Ripping foil...';
-
         pullResult.className = 'pull-result state-loading';
-        pullResult.innerHTML = '<div class="result-label" style="color:var(--primary)">Extracting...</div>';
+        pullResult.innerHTML = '<div class="result-label" style="color:var(--primary)">Contacting server...</div>';
 
-        // ── TEARING SHAKE ──
+        // ── TEARING + SERVER CALL in parallel ──
         wrap.classList.add('tearing');
+        const serverCall = fetch(`${APPS_SCRIPT_URL}?action=pull`)
+          .then(r => r.json())
+          .catch(() => ({ status: 'error', message: '// CONNECTION LOST: Check your network.' }));
+
         await sleep(1400);
         wrap.classList.remove('tearing');
 
-        // ── RNG ──
-        const roll = Math.random() * 100;
-        let rarity, code, color, stateClass;
-        if (roll < 0.1)       { rarity='LEGENDARY'; code='JSX8047'; color='#ffb703'; stateClass='state-legendary'; }
-        else if (roll < 1.1)  { rarity='EPIC';      code='YRH9186'; color='#d946ef'; stateClass='state-epic'; }
-        else if (roll < 6.1)  { rarity='RARE';      code='782CUXR'; color='#00f5ff'; stateClass='state-rare'; }
-        else                  { rarity='COMMON';    code=null;      color='rgba(255,255,255,0.3)'; stateClass='state-dud'; }
+        const data = await serverCall;
 
-        // ── BURST: animate pack out via inline JS only ──
+        if (data.status === 'error') {
+          pullResult.className = 'pull-result state-dud';
+          pullResult.innerHTML = `<div class="result-label" style="color:var(--error)">${data.message}</div>`;
+          pullBtn.disabled = false;
+          pullBtn.textContent = 'Try Again';
+          return;
+        }
+
+        const rarity = data.rarity || 'COMMON';
+        const code   = data.code   || null;
+        const style  = RARITY_STYLES[rarity] || RARITY_STYLES['COMMON'];
+        const { color, stateClass, btnClass } = style;
+
+        // ── BURST ──
         spawnParticles(color);
         if (rarity !== 'COMMON') flashScreen(color);
 
         packEl.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out, filter 0.25s ease-out';
-        packEl.style.transform = 'scale(1.1)';
-        packEl.style.filter = 'brightness(2.5)';
-        packEl.style.opacity = '0';
-
+        packEl.style.transform  = 'scale(1.1)';
+        packEl.style.filter     = 'brightness(2.5)';
+        packEl.style.opacity    = '0';
         await sleep(280);
 
-        // ── REVEAL CARD (non-common only) ──
-        if (rarity !== 'COMMON') {
-          revealRarity.textContent = rarity;
-          revealRarity.style.color = color;
-          revealCodeText.textContent = code;
-          revealCodeText.style.color = color;
-          revealCard.style.background = `linear-gradient(135deg, #1a1c29 0%, ${color}20 100%)`;
-          revealCard.style.border = `2px solid ${color}60`;
-          revealCard.style.boxShadow = `0 0 30px ${color}40`;
+        // ── REVEAL CARD ──
+        if (code) {
+          revealRarity.textContent       = rarity;
+          revealRarity.style.color       = color;
+          revealCode.textContent         = code;
+          revealCode.style.color         = color;
+          revealCard.style.background    = `linear-gradient(135deg, #1a1c29 0%, ${color}20 100%)`;
+          revealCard.style.border        = `2px solid ${color}60`;
+          revealCard.style.boxShadow     = `0 0 30px ${color}40`;
           revealCard.classList.add('visible');
         }
 
@@ -632,14 +643,13 @@
         } else {
           codesFound++;
           document.getElementById('codes-found-count').textContent = codesFound;
-          const btnStyle = rarity==='LEGENDARY' ? 'legendary-style' : rarity==='EPIC' ? 'epic-style' : '';
           pullResult.innerHTML = `
-            <div class="result-label" style="color:${color}">${rarity} PULL!</div>
+            <div class="result-label" style="color:${color}">${rarity}!</div>
             <div class="result-code" style="color:${color}" onclick="copyToUnlocker('${code}')">${code}</div>
             <div class="result-hint">Tap code to paste into terminal below</div>
-            <button class="copy-btn ${btnStyle}" onclick="copyToUnlocker('${code}')">↓ Send to Terminal</button>
+            <button class="copy-btn ${btnClass}" onclick="copyToUnlocker('${code}')">↓ Send to Terminal</button>
           `;
-          if (rarity==='LEGENDARY' || rarity==='EPIC') fireConfetti(color);
+          if (rarity === 'SECRET RARE' || rarity === 'ULTRA RARE') fireConfetti(color);
           setStep(2);
           document.getElementById('tip-banner').classList.add('hidden');
         }
