@@ -43,7 +43,6 @@
       z-index: 100;
     }
 
-    /* Adjusted wrapper for side-by-side on desktop, stacked on mobile */
     .gacha-wrapper {
       flex-grow: 1;
       display: flex;
@@ -85,29 +84,72 @@
 
     h2 { margin-top: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; background: linear-gradient(90deg, #fff 30%, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 245, 255, 0.2); }
     
-    /* INTERCEPTOR SPECIFIC STYLES */
-    .radar-container {
-      margin: 30px auto;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      border: 2px solid rgba(0, 245, 255, 0.3);
-      background: radial-gradient(circle, rgba(0,245,255,0.1) 0%, transparent 70%);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+    /* BOOSTER PACK PULLER STYLES */
+    .booster-container {
+      margin: 20px auto;
+      width: 140px;
+      height: 220px;
+      perspective: 1000px;
     }
 
-    .radar-sweep {
+    .booster-pack {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #4b5563 0%, #9ca3af 50%, #374151 100%);
+      border-radius: 6px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.3);
+      animation: floatBooster 3s ease-in-out infinite;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-top: 14px solid #1f2937; 
+      border-bottom: 14px solid #1f2937; 
+    }
+
+    /* Crimped edges */
+    .booster-pack::before {
+      content: ''; position: absolute; top: -14px; left: 0; right: 0; height: 14px;
+      background: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px);
+    }
+    .booster-pack::after {
+      content: ''; position: absolute; bottom: -14px; left: 0; right: 0; height: 14px;
+      background: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px);
+    }
+
+    .booster-foil {
       position: absolute;
-      top: 0; left: 50%;
-      width: 50%; height: 50%;
-      background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.5));
-      transform-origin: bottom left;
-      animation: spin 2s linear infinite;
-      display: none;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.7) 25%, transparent 30%);
+      background-size: 200% 200%;
+      animation: foilShine 2.5s linear infinite;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+
+    .booster-label {
+      background: #000;
+      color: var(--primary);
+      padding: 8px 16px;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 4px;
+      border: 1px solid var(--primary);
+      transform: rotate(-6deg);
+      box-shadow: 0 0 15px rgba(0,245,255,0.4);
+      z-index: 2;
+    }
+
+    /* Tearing Animations */
+    .booster-pack.tearing {
+      animation: packShake 0.12s infinite;
+      filter: brightness(1.4);
+    }
+    .booster-pack.opened {
+      transform: scale(0.5) translateY(-50px);
+      opacity: 0;
     }
 
     .pulled-code-display {
@@ -162,7 +204,9 @@
     .error { color: var(--error); text-shadow: 0 0 10px rgba(244, 67, 54, 0.2); }
     .info { color: rgba(255,255,255,0.4); }
 
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes floatBooster { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes foilShine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes packShake { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-4px) rotate(-3deg); } 75% { transform: translateX(4px) rotate(3deg); } }
     @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
     @keyframes pulseGlow { 0%, 100% { width: 150px; opacity: 0.7; } 50% { width: 180px; opacity: 1; } }
     @keyframes holoStream { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
@@ -196,20 +240,22 @@
   <main class="gacha-wrapper">
     
     <div class="dashboard" id="interceptor-dashboard">
-      <h2>Signal Interceptor</h2>
-      <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:10px;">Hack the mainframe to extract an access code. Low drop rates.</p>
+      <h2>Access Code Booster</h2>
+      <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:10px;">Rip open a foil pack to find an access code. Low pull rates for Legendary.</p>
       
-      <div class="radar-container" id="radar">
-        <div class="radar-sweep" id="radar-sweep"></div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(0,245,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="radar-icon"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <div class="booster-container" id="booster-container" onclick="simulatePull()">
+        <div class="booster-pack" id="booster">
+          <div class="booster-foil"></div>
+          <div class="booster-label">DATA PACK</div>
+        </div>
       </div>
 
       <div class="pulled-code-display" id="code-display">
-        <span style="color: rgba(255,255,255,0.3);">AWAITING COMMAND...</span>
+        <span style="color: rgba(255,255,255,0.3);">PACK SEALED...</span>
       </div>
 
       <div class="input-group">
-        <button class="gacha-btn interceptor-btn" id="pullBtn" onclick="simulatePull()">Initiate Hack (Free)</button>
+        <button class="gacha-btn interceptor-btn" id="pullBtn" onclick="simulatePull()">Crack Pack (Free)</button>
       </div>
     </div>
 
@@ -253,31 +299,33 @@
     let isPulling = false;
 
     // ==========================================
-    // 2. GACHA SIMULATOR (Code Puller)
+    // 2. GACHA SIMULATOR (Booster Puller)
     // ==========================================
     async function simulatePull() {
       if (isPulling) return;
       isPulling = true;
 
       const pullBtn = document.getElementById('pullBtn');
-      const sweep = document.getElementById('radar-sweep');
-      const icon = document.getElementById('radar-icon');
+      const booster = document.getElementById('booster');
       const display = document.getElementById('code-display');
 
-      // UI Unlocking state
+      // UI Tearing state
       pullBtn.disabled = true;
-      pullBtn.textContent = "DECRYPTING...";
-      sweep.style.display = 'block';
-      icon.style.opacity = '0.2';
-      display.innerHTML = '<span style="color: var(--primary); animation: pulse 1s infinite;">SEARCHING NODES...</span>';
+      pullBtn.textContent = "RIPPING FOIL...";
+      booster.classList.add('tearing');
+      
+      display.innerHTML = '<span style="color: var(--primary); animation: pulse 1s infinite;">EXTRACTING...</span>';
       display.style.borderColor = 'var(--primary)';
       display.style.boxShadow = '0 0 15px rgba(0, 245, 255, 0.2)';
 
       // Fake delay for suspense
-      await new Promise(r => setTimeout(r, 2500));
+      await new Promise(r => setTimeout(r, 1800));
+
+      // Pack burst
+      booster.classList.remove('tearing');
+      booster.classList.add('opened');
 
       // RNG LOGIC
-      // Math.random() generates between 0.000 and 0.999... Multiplying by 100 gives 0.00 to 99.99
       const roll = Math.random() * 100; 
       
       let rarity = "COMMON";
@@ -285,63 +333,57 @@
       let color = "#525875";
 
       if (roll < 0.1) {
-        // 0.1% Chance
         rarity = "LEGENDARY";
-        code = "JSX8047"; // Add this exact code to Google Sheets
+        code = "JSX8047"; 
         color = "var(--accent)";
       } else if (roll < 1.1) {
-        // 1% Chance (0.1 to 1.1)
         rarity = "EPIC";
-        code = "YRH9186"; // Add this exact code to Google Sheets
+        code = "YRH9186"; 
         color = "var(--epic)";
       } else if (roll < 6.1) {
-        // 5% Chance (1.1 to 6.1)
         rarity = "RARE";
-        code = "782CUXR"; // Add this exact code to Google Sheets
+        code = "782CUXR"; 
         color = "var(--primary)";
       } else {
-        // 93.9% Chance
         rarity = "COMMON";
-        code = "RIP AGAIN";
+        code = "RIP_ANOTHER_PACK";
         color = "rgba(255,255,255,0.4)";
       }
 
       // Reset UI and show result
-      sweep.style.display = 'none';
-      icon.style.opacity = '1';
-      pullBtn.disabled = false;
-      pullBtn.textContent = "HACK AGAIN";
-      
       display.style.borderColor = color;
       display.style.boxShadow = `0 0 20px ${color}40`;
       
       if (rarity === "COMMON") {
         display.innerHTML = `
-          <div class="rarity-label" style="color: ${color}">FAILED</div>
-          <div style="color: #fff; font-size: 14px;">Trace detected. Aborting.</div>
+          <div class="rarity-label" style="color: ${color}">DUD PACK</div>
+          <div style="color: #fff; font-size: 14px;">Better luck next pull.</div>
         `;
       } else {
         display.innerHTML = `
-          <div class="rarity-label" style="color: ${color}">${rarity} CODE MINED!</div>
+          <div class="rarity-label" style="color: ${color}">${rarity} PULL!</div>
           <div style="color: #fff; font-weight: 900; user-select: all; cursor: pointer;" onclick="copyToUnlocker('${code}')">${code}</div>
           <div style="font-size: 10px; color: ${color}; margin-top: 5px;">Click code to copy to terminal</div>
         `;
         if (rarity === "LEGENDARY" || rarity === "EPIC") fireConfetti(color);
       }
 
-      isPulling = false;
+      // Allow pulling again after a short delay, restore the pack visually
+      setTimeout(() => {
+        pullBtn.disabled = false;
+        pullBtn.textContent = "CRACK ANOTHER";
+        booster.classList.remove('opened');
+        isPulling = false;
+      }, 1200);
     }
 
-    // Helper to move the pulled code down to the input field easily
     function copyToUnlocker(code) {
       const input = document.getElementById('passcodeInput');
       input.value = code;
       input.focus();
-      // Optional visual feedback on the input box
       input.style.boxShadow = '0 0 20px var(--primary)';
       setTimeout(() => input.style.boxShadow = '', 1000);
     }
-
 
     // ==========================================
     // 3. PACK UNLOCKER LOGIC
