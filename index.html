@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Crate Drop - Encrypted Pack</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     :root {
       --primary: #00f5ff; /* Cyan Energy Matrix */
@@ -16,6 +19,7 @@
 
     * { box-sizing: border-box; }
 
+    /* Updated Body for Scrolling */
     body {
       margin: 0;
       padding: 0;
@@ -27,19 +31,27 @@
       color: #ffffff;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden; /* Allow vertical scroll, prevent horizontal */
     }
 
-    /* Confetti Canvas */
+    /* Confetti Canvas - Set to fixed so it covers screen even when scrolling */
     #confetti-canvas {
-      position: absolute;
+      position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       pointer-events: none;
       z-index: 100;
+    }
+
+    /* Wrapper for the Gacha UI */
+    .gacha-wrapper {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
     }
 
     /* Immersive Gacha Terminal Window */
@@ -48,7 +60,7 @@
       border: 1px solid var(--surface-border);
       border-radius: 24px;
       padding: 35px 30px;
-      width: 92%;
+      width: 100%;
       max-width: 440px;
       text-align: center;
       box-shadow: 
@@ -71,328 +83,101 @@
     .dashboard::before { top: 15px; left: 15px; border-right: 0; border-bottom: 0; border-top-left-radius: 8px;}
     .dashboard::after { bottom: 15px; right: 15px; border-left: 0; border-top: 0; border-bottom-right-radius: 8px;}
 
-    h2 {
-      margin-top: 0;
-      font-size: 20px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      background: linear-gradient(90deg, #fff 30%, var(--primary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
-    }
-
-    /* Pack Energy Stage & Pedestal Glow */
-    .pack-container {
-      perspective: 1200px;
-      margin: 40px auto;
-      width: 210px;
-      height: 300px;
-      position: relative;
-    }
-
-    .pedestal-glow {
-      position: absolute;
-      bottom: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 160px;
-      height: 20px;
-      background: radial-gradient(ellipse, rgba(0, 245, 255, 0.4) 0%, transparent 70%);
-      z-index: 1;
-      animation: pulseGlow 4s ease-in-out infinite;
-    }
-
-    /* Premium Physical Booster Pack Construction */
-    .pack {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(140deg, #1b1e36 0%, #090a12 50%, #25294a 100%);
-      border-left: 1px solid rgba(255,255,255,0.1);
-      border-right: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 
-        0 15px 35px rgba(0, 0, 0, 0.7),
-        0 0 25px rgba(0, 245, 255, 0.1);
-      position: relative;
-      z-index: 2;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      animation: float 4s ease-in-out infinite;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
-
-    /* Real-feel Foil Crimps (Top/Bottom Jagged Edges) */
-    .pack::before, .pack::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 12px;
-      background-image: linear-gradient(90deg, #111 50%, #333 50%);
-      background-size: 6px 100%;
-      border-top: 1px solid rgba(255,255,255,0.15);
-      border-bottom: 1px solid rgba(0,0,0,0.4);
-      z-index: 5;
-    }
+    /* (Rest of the previous custom CSS remains identical) */
+    h2 { margin-top: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; background: linear-gradient(90deg, #fff 30%, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 245, 255, 0.2); }
+    .pack-container { perspective: 1200px; margin: 40px auto; width: 210px; height: 300px; position: relative; }
+    .pedestal-glow { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 160px; height: 20px; background: radial-gradient(ellipse, rgba(0, 245, 255, 0.4) 0%, transparent 70%); z-index: 1; animation: pulseGlow 4s ease-in-out infinite; }
+    .pack { width: 100%; height: 100%; background: linear-gradient(140deg, #1b1e36 0%, #090a12 50%, #25294a 100%); border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 245, 255, 0.1); position: relative; z-index: 2; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: float 4s ease-in-out infinite; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .pack::before, .pack::after { content: ''; position: absolute; left: 0; width: 100%; height: 12px; background-image: linear-gradient(90deg, #111 50%, #333 50%); background-size: 6px 100%; border-top: 1px solid rgba(255,255,255,0.15); border-bottom: 1px solid rgba(0,0,0,0.4); z-index: 5; }
     .pack::before { top: 0; }
     .pack::after { bottom: 0; transform: rotate(180deg); }
-
-    /* Ultra-Reflective Holographic Finish */
-    .pack-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(105deg, 
-        transparent 30%, 
-        rgba(0, 245, 255, 0.12) 40%, 
-        rgba(217, 70, 239, 0.12) 50%, 
-        transparent 60%
-      );
-      background-size: 300% 300%;
-      background-position: 0% 0%;
-      animation: holoStream 4s ease infinite;
-      z-index: 3;
-    }
-
-    /* Industrial Tech-Graphic Pack Details */
-    .pack-art {
-      width: 80%;
-      height: 80%;
-      border: 1px solid rgba(0, 245, 255, 0.2);
-      background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, transparent 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      position: relative;
-    }
-
-    .pack-art::before {
-      content: 'LIMITER ACTIVE';
-      position: absolute;
-      top: 8px;
-      font-size: 8px;
-      letter-spacing: 2px;
-      color: rgba(0, 245, 255, 0.4);
-      font-family: monospace;
-    }
-
-    .pack-logo {
-      font-size: 32px;
-      font-weight: 950;
-      letter-spacing: 6px;
-      color: #ffffff;
-      text-shadow: 
-        0 0 10px rgba(0,245,255,0.6),
-        0 4px 0px #0b0c16;
-      border-top: 2px solid #fff;
-      border-bottom: 2px solid #fff;
-      padding: 6px 12px;
-      transform: scale(0.9);
-    }
-
-    /* Gacha Input & Controls Consolidation */
-    .input-group {
-      margin-top: 25px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    input[type="text"] {
-      background: #090a10;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--primary);
-      padding: 16px;
-      font-size: 16px;
-      font-family: monospace;
-      text-align: center;
-      text-transform: uppercase;
-      border-radius: 10px;
-      outline: none;
-      transition: all 0.3s ease;
-      letter-spacing: 3px;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 20px rgba(0, 245, 255, 0.15);
-      background: #0d0f1a;
-    }
-
-    button {
-      background: linear-gradient(135deg, var(--primary) 0%, #00bfff 100%);
-      color: #04060a;
-      border: none;
-      padding: 16px;
-      font-size: 15px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-      box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(0, 245, 255, 0.5);
-      filter: brightness(1.1);
-    }
-
-    button:active {
-      transform: translateY(1px);
-    }
-
-    button:disabled {
-      background: #1f2230;
-      color: #525875;
-      box-shadow: none;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Immersive Trophy/Card Display Frame on Success */
-    .reward-area {
-      display: none;
-      animation: cardManifest 0.75s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-    }
-
-    .loot-card {
-      background: linear-gradient(135deg, #232742 0%, #111322 100%);
-      border: 2px solid var(--accent);
-      border-radius: 16px;
-      padding: 20px;
-      margin: 20px 0;
-      box-shadow: 0 0 35px rgba(255, 183, 3, 0.25);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Rarity Badge overlay styling */
-    .rarity-tag {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: var(--accent);
-      color: #000;
-      font-size: 9px;
-      font-weight: 900;
-      padding: 2px 8px;
-      border-radius: 20px;
-      letter-spacing: 1px;
-    }
-
-    .reward-image {
-      max-width: 100%;
-      height: 220px;
-      object-fit: contain;
-      border-radius: 10px;
-      background: rgba(0,0,0,0.3);
-      padding: 10px;
-      border: 1px solid rgba(255, 183, 3, 0.15);
-      margin: 15px 0 5px 0;
-      display: none;
-    }
-
-    .reward-text {
-      font-size: 26px;
-      font-weight: 900;
-      color: #ffffff;
-      text-shadow: 0 0 15px rgba(255, 183, 3, 0.5);
-      margin: 25px 0 15px 0;
-      letter-spacing: 1px;
-      display: none;
-    }
-
+    .pack-overlay { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(0, 245, 255, 0.12) 40%, rgba(217, 70, 239, 0.12) 50%, transparent 60%); background-size: 300% 300%; background-position: 0% 0%; animation: holoStream 4s ease infinite; z-index: 3; }
+    .pack-art { width: 80%; height: 80%; border: 1px solid rgba(0, 245, 255, 0.2); background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, transparent 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; position: relative; }
+    .pack-art::before { content: 'LIMITER ACTIVE'; position: absolute; top: 8px; font-size: 8px; letter-spacing: 2px; color: rgba(0, 245, 255, 0.4); font-family: monospace; }
+    .pack-logo { font-size: 32px; font-weight: 950; letter-spacing: 6px; color: #ffffff; text-shadow: 0 0 10px rgba(0,245,255,0.6), 0 4px 0px #0b0c16; border-top: 2px solid #fff; border-bottom: 2px solid #fff; padding: 6px 12px; transform: scale(0.9); }
+    .input-group { margin-top: 25px; display: flex; flex-direction: column; gap: 12px; }
+    input[type="text"] { background: #090a10; border: 1px solid rgba(255, 255, 255, 0.1); color: var(--primary); padding: 16px; font-size: 16px; font-family: monospace; text-align: center; text-transform: uppercase; border-radius: 10px; outline: none; transition: all 0.3s ease; letter-spacing: 3px; }
+    input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 20px rgba(0, 245, 255, 0.15); background: #0d0f1a; }
+    button.gacha-btn { background: linear-gradient(135deg, var(--primary) 0%, #00bfff 100%); color: #04060a; border: none; padding: 16px; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-radius: 10px; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3); }
+    button.gacha-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0, 245, 255, 0.5); filter: brightness(1.1); }
+    button.gacha-btn:active { transform: translateY(1px); }
+    button.gacha-btn:disabled { background: #1f2230; color: #525875; box-shadow: none; cursor: not-allowed; transform: none; }
+    .reward-area { display: none; animation: cardManifest 0.75s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+    .loot-card { background: linear-gradient(135deg, #232742 0%, #111322 100%); border: 2px solid var(--accent); border-radius: 16px; padding: 20px; margin: 20px 0; box-shadow: 0 0 35px rgba(255, 183, 3, 0.25); position: relative; overflow: hidden; }
+    .rarity-tag { position: absolute; top: 12px; right: 12px; background: var(--accent); color: #000; font-size: 9px; font-weight: 900; padding: 2px 8px; border-radius: 20px; letter-spacing: 1px; }
+    .reward-image { max-width: 100%; height: 220px; object-fit: contain; border-radius: 10px; background: rgba(0,0,0,0.3); padding: 10px; border: 1px solid rgba(255, 183, 3, 0.15); margin: 15px 0 5px 0; display: none; }
+    .reward-text { font-size: 26px; font-weight: 900; color: #ffffff; text-shadow: 0 0 15px rgba(255, 183, 3, 0.5); margin: 25px 0 15px 0; letter-spacing: 1px; display: none; }
     #status-msg { margin-top: 18px; font-size: 13px; font-family: monospace; min-height: 20px; }
     .error { color: var(--error); text-shadow: 0 0 10px rgba(244, 67, 54, 0.2); }
     .info { color: rgba(255,255,255,0.4); }
 
-    /* Animation Protocols */
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-12px) rotate(1deg); }
-    }
-    @keyframes pulseGlow {
-      0%, 100% { width: 150px; opacity: 0.7; }
-      50% { width: 180px; opacity: 1; }
-    }
-    @keyframes holoStream {
-      0% { background-position: 0% 0%; }
-      100% { background-position: 100% 100%; }
-    }
-    @keyframes coreOverdrive {
-      0%, 100% { transform: translateX(0) scale(1.04); }
-      20% { transform: translateX(-3px) rotate(-1.5deg) scale(1.05); }
-      40% { transform: translateX(3px) rotate(1.5deg) scale(1.06); }
-      60% { transform: translateX(-4px) rotate(-1deg) scale(1.05); }
-      80% { transform: translateX(4px) rotate(2deg) scale(1.06); }
-    }
-    @keyframes cardManifest {
-      0% { opacity: 0; transform: scale(0.6) rotateX(-30deg); filter: brightness(3); }
-      100% { opacity: 1; transform: scale(1) rotateX(0deg); filter: brightness(1); }
-    }
-
-    /* Core Unlocking State Modifier */
-    .pack.unlocking {
-      animation: coreOverdrive 0.15s infinite;
-      box-shadow: 0 0 50px var(--primary);
-      border-color: var(--primary);
-    }
-    .pack.error-shake {
-      animation: coreOverdrive 0.3s 2;
-      box-shadow: 0 0 40px var(--error);
-      border-color: var(--error);
-    }
+    @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
+    @keyframes pulseGlow { 0%, 100% { width: 150px; opacity: 0.7; } 50% { width: 180px; opacity: 1; } }
+    @keyframes holoStream { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+    @keyframes coreOverdrive { 0%, 100% { transform: translateX(0) scale(1.04); } 20% { transform: translateX(-3px) rotate(-1.5deg) scale(1.05); } 40% { transform: translateX(3px) rotate(1.5deg) scale(1.06); } 60% { transform: translateX(-4px) rotate(-1deg) scale(1.05); } 80% { transform: translateX(4px) rotate(2deg) scale(1.06); } }
+    @keyframes cardManifest { 0% { opacity: 0; transform: scale(0.6) rotateX(-30deg); filter: brightness(3); } 100% { opacity: 1; transform: scale(1) rotateX(0deg); filter: brightness(1); } }
+    .pack.unlocking { animation: coreOverdrive 0.15s infinite; box-shadow: 0 0 50px var(--primary); border-color: var(--primary); }
+    .pack.error-shake { animation: coreOverdrive 0.3s 2; box-shadow: 0 0 40px var(--error); border-color: var(--error); }
     .hidden { display: none !important; }
-
   </style>
 </head>
 <body>
 
+  <nav class="bg-black text-white p-4 sticky top-0 z-50 shadow-2xl w-full">
+    <div class="container mx-auto flex flex-wrap justify-between items-center gap-y-4">
+      <a href="https://cratedropcollective.github.io/" class="flex flex-col hover:opacity-80 transition-opacity">
+        <span class="text-lg md:text-xl font-black tracking-tighter leading-none">CRATE DROP</span>
+        <span class="text-[10px] font-bold text-blue-500 tracking-[0.2em]">COLLECTIVE</span>
+      </a>
+      
+      <div class="flex items-center space-x-1 md:space-x-3 order-last w-full justify-center md:w-auto md:order-none">
+        <a href="https://cratedropcollective.github.io/" class="text-[10px] md:text-xs font-bold text-gray-400 hover:text-white uppercase tracking-wider transition-colors px-3 py-1.5 rounded-full hover:bg-white/10">Home</a>
+        <a href="/products" class="text-[10px] md:text-xs font-bold text-gray-400 hover:text-white uppercase tracking-wider transition-colors px-3 py-1.5 rounded-full hover:bg-white/10">Products</a>
+        <a href="/preorder" class="text-[10px] md:text-xs font-bold text-white bg-white/20 px-4 py-1.5 rounded-full uppercase tracking-wider">Preorder</a>
+      </div>
+    </div>
+  </nav>
+
   <canvas id="confetti-canvas"></canvas>
 
-  <div class="dashboard" id="dashboard">
-    <h2>Secure VIP Drop</h2>
-    
-    <div class="pack-container" id="pack-container">
-      <div class="pedestal-glow" id="pedestal"></div>
-      <div class="pack" id="visual-pack">
-        <div class="pack-overlay"></div>
-        <div class="pack-art">
-          <div class="pack-logo">CDC</div>
+  <main class="gacha-wrapper">
+    <div class="dashboard" id="dashboard">
+      <h2>Secure VIP Drop</h2>
+      
+      <div class="pack-container" id="pack-container">
+        <div class="pedestal-glow" id="pedestal"></div>
+        <div class="pack" id="visual-pack">
+          <div class="pack-overlay"></div>
+          <div class="pack-art">
+            <div class="pack-logo">CDC</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="reward-area" id="reward-area">
-      <div class="loot-card">
-        <div class="rarity-tag">UNLOCKED</div>
-        <img id="reward-img" class="reward-image" src="" alt="Reward Image">
-        <div id="reward-txt" class="reward-text"></div>
+      <div class="reward-area" id="reward-area">
+        <div class="loot-card">
+          <div class="rarity-tag">UNLOCKED</div>
+          <img id="reward-img" class="reward-image" src="" alt="Reward Image">
+          <div id="reward-txt" class="reward-text"></div>
+        </div>
+        <p style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom: 20px;">Take a snapshot to claim verification record.</p>
+        <button class="gacha-btn" style="width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #fff; box-shadow: none;" onclick="location.reload()">Scan Next Sigil</button>
       </div>
-      <p style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom: 20px;">Take a snapshot to claim verification record.</p>
-      <button style="width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #fff; box-shadow: none;" onclick="location.reload()">Scan Next Sigil</button>
-    </div>
 
-    <div class="input-group" id="input-group">
-      <input type="text" id="passcodeInput" placeholder="ENTER CODE" autocomplete="off" spellcheck="false">
-      <button id="unlockBtn" onclick="processDecrypt()">Unlock Pack</button>
-      <div id="status-msg" class="info">// SYS READY: Awaiting input matrix</div>
+      <div class="input-group" id="input-group">
+        <input type="text" id="passcodeInput" placeholder="ENTER CODE" autocomplete="off" spellcheck="false">
+        <button class="gacha-btn" id="unlockBtn" onclick="processDecrypt()">Unlock Pack</button>
+        <div id="status-msg" class="info">// SYS READY: Awaiting input matrix</div>
+      </div>
     </div>
-  </div>
+  </main>
 
   <script>
     // ==========================================
     // 1. CONFIGURATION
     // ==========================================
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywuiVPzsb-R64Q9dfcmjfZ50_0l8_rta_3ERPjjW0YCN0YFRtPSTqSdBa2P0sv6eCf/exec";
+    // Update this to your NEW deployed Apps Script URL
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwD4Jxcya9WQvqSumFK70bPjjTPYB0oT3iHpjViFdbHdhTVaRPMC-U0LLh__xLHuFgF/exec";
 
     // ==========================================
     // 2. MAIN LOGIC
@@ -429,7 +214,7 @@
         if (data.status === "success") {
           showSuccess(data.reward);
         } else {
-          triggerError(data.message || "// DECRYPTION FAILED: Code expired/voided.");
+          triggerError(data.message || "// DECRYPTION FAILED: Capacity reached or invalid.");
         }
       } catch (error) {
         console.error(error);
