@@ -6,9 +6,11 @@
   <title>Crate Drop - Encrypted Pack</title>
   <style>
     :root {
-      --primary: #2563eb;
-      --bg-color: #0d0e15;
-      --surface: #1a1c29;
+      --primary: #00f5ff; /* Cyan Energy Matrix */
+      --accent: #ffb703;  /* Legendary Gold Pull */
+      --bg-color: #06070d;
+      --surface: #11131f;
+      --surface-border: rgba(0, 245, 255, 0.15);
       --error: #ff3366;
     }
 
@@ -19,6 +21,9 @@
       padding: 0;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(0, 245, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(217, 70, 239, 0.05) 0%, transparent 60%);
       color: #ffffff;
       display: flex;
       flex-direction: column;
@@ -37,190 +42,312 @@
       z-index: 100;
     }
 
+    /* Immersive Gacha Terminal Window */
     .dashboard {
-      background: var(--surface);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 40px;
-      width: 90%;
-      max-width: 450px;
+      background: linear-gradient(180deg, #16192b 0%, #0e101a 100%);
+      border: 1px solid var(--surface-border);
+      border-radius: 24px;
+      padding: 35px 30px;
+      width: 92%;
+      max-width: 440px;
       text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      box-shadow: 
+        0 0 40px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(0, 245, 255, 0.03);
       position: relative;
       z-index: 10;
+      backdrop-filter: blur(10px);
     }
+
+    /* Tech-Bracket Corner Accents */
+    .dashboard::before, .dashboard::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--primary);
+      pointer-events: none;
+    }
+    .dashboard::before { top: 15px; left: 15px; border-right: 0; border-bottom: 0; border-top-left-radius: 8px;}
+    .dashboard::after { bottom: 15px; right: 15px; border-left: 0; border-top: 0; border-bottom-right-radius: 8px;}
 
     h2 {
       margin-top: 0;
-      font-weight: 800;
+      font-size: 20px;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      background: linear-gradient(90deg, #fff, var(--primary));
+      letter-spacing: 4px;
+      background: linear-gradient(90deg, #fff 30%, var(--primary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
     }
 
-    /* The Pack Graphic */
+    /* Pack Energy Stage & Pedestal Glow */
     .pack-container {
-      perspective: 1000px;
-      margin: 30px auto;
-      width: 200px;
-      height: 280px;
+      perspective: 1200px;
+      margin: 40px auto;
+      width: 210px;
+      height: 300px;
       position: relative;
     }
 
+    .pedestal-glow {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 20px;
+      background: radial-gradient(ellipse, rgba(0, 245, 255, 0.4) 0%, transparent 70%);
+      z-index: 1;
+      animation: pulseGlow 4s ease-in-out infinite;
+    }
+
+    /* Premium Physical Booster Pack Construction */
     .pack {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #2b2e4a, #1a1c29, #2b2e4a);
-      border-radius: 12px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 10px 30px rgba(0, 255, 204, 0.2);
+      background: linear-gradient(140deg, #1b1e36 0%, #090a12 50%, #25294a 100%);
+      border-left: 1px solid rgba(255,255,255,0.1);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.7),
+        0 0 25px rgba(0, 245, 255, 0.1);
       position: relative;
+      z-index: 2;
       overflow: hidden;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       animation: float 4s ease-in-out infinite;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
-    /* Holographic shine effect */
-    .pack::after {
+    /* Real-feel Foil Crimps (Top/Bottom Jagged Edges) */
+    .pack::before, .pack::after {
       content: '';
       position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: linear-gradient(45deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 60%);
-      animation: holo 3s linear infinite;
+      left: 0;
+      width: 100%;
+      height: 12px;
+      background-image: linear-gradient(90deg, #111 50%, #333 50%);
+      background-size: 6px 100%;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      border-bottom: 1px solid rgba(0,0,0,0.4);
+      z-index: 5;
+    }
+    .pack::before { top: 0; }
+    .pack::after { bottom: 0; transform: rotate(180deg); }
+
+    /* Ultra-Reflective Holographic Finish */
+    .pack-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, 
+        transparent 30%, 
+        rgba(0, 245, 255, 0.12) 40%, 
+        rgba(217, 70, 239, 0.12) 50%, 
+        transparent 60%
+      );
+      background-size: 300% 300%;
+      background-position: 0% 0%;
+      animation: holoStream 4s ease infinite;
+      z-index: 3;
+    }
+
+    /* Industrial Tech-Graphic Pack Details */
+    .pack-art {
+      width: 80%;
+      height: 80%;
+      border: 1px solid rgba(0, 245, 255, 0.2);
+      background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      position: relative;
+    }
+
+    .pack-art::before {
+      content: 'LIMITER ACTIVE';
+      position: absolute;
+      top: 8px;
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: rgba(0, 245, 255, 0.4);
+      font-family: monospace;
     }
 
     .pack-logo {
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      color: rgba(255,255,255,0.8);
-      transform: rotate(-15deg);
-      border: 2px solid rgba(255,255,255,0.5);
-      padding: 10px;
-      border-radius: 8px;
+      font-size: 32px;
+      font-weight: 950;
+      letter-spacing: 6px;
+      color: #ffffff;
+      text-shadow: 
+        0 0 10px rgba(0,245,255,0.6),
+        0 4px 0px #0b0c16;
+      border-top: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 6px 12px;
+      transform: scale(0.9);
     }
 
-    /* Input & Button */
+    /* Gacha Input & Controls Consolidation */
     .input-group {
-      margin-top: 20px;
+      margin-top: 25px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 12px;
     }
 
     input[type="text"] {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #090a10;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--primary);
-      padding: 15px;
-      font-size: 18px;
+      padding: 16px;
+      font-size: 16px;
+      font-family: monospace;
       text-align: center;
       text-transform: uppercase;
-      border-radius: 8px;
+      border-radius: 10px;
       outline: none;
-      transition: border 0.3s, box-shadow 0.3s;
-      letter-spacing: 2px;
+      transition: all 0.3s ease;
+      letter-spacing: 3px;
     }
 
     input[type="text"]:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+      box-shadow: 0 0 20px rgba(0, 245, 255, 0.15);
+      background: #0d0f1a;
     }
 
     button {
-      background: var(--primary);
-      color: #000;
+      background: linear-gradient(135deg, var(--primary) 0%, #00bfff 100%);
+      color: #04060a;
       border: none;
-      padding: 15px;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      border-radius: 8px;
+      letter-spacing: 2px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
     }
 
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+      box-shadow: 0 6px 25px rgba(0, 245, 255, 0.5);
+      filter: brightness(1.1);
+    }
+
+    button:active {
+      transform: translateY(1px);
     }
 
     button:disabled {
-      background: #444;
-      color: #888;
+      background: #1f2230;
+      color: #525875;
       box-shadow: none;
       cursor: not-allowed;
       transform: none;
     }
 
-    /* Reward Reveal Area (Hidden Initially) */
+    /* Immersive Trophy/Card Display Frame on Success */
     .reward-area {
       display: none;
-      animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      animation: cardManifest 0.75s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    }
+
+    .loot-card {
+      background: linear-gradient(135deg, #232742 0%, #111322 100%);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 0 35px rgba(255, 183, 3, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Rarity Badge overlay styling */
+    .rarity-tag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: #000;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 1px;
     }
 
     .reward-image {
       max-width: 100%;
-      border-radius: 8px;
-      border: 2px solid var(--primary);
-      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
-      margin: 20px 0;
+      height: 220px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border: 1px solid rgba(255, 183, 3, 0.15);
+      margin: 15px 0 5px 0;
       display: none;
     }
 
     .reward-text {
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--primary);
-      margin: 20px 0;
-      padding: 20px;
-      background: rgba(0, 255, 204, 0.1);
-      border: 1px dashed var(--primary);
-      border-radius: 8px;
+      font-size: 26px;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 183, 3, 0.5);
+      margin: 25px 0 15px 0;
+      letter-spacing: 1px;
       display: none;
     }
 
-    #status-msg { margin-top: 15px; font-size: 14px; min-height: 20px; }
-    .error { color: var(--error); }
-    .info { color: #aaa; }
+    #status-msg { margin-top: 18px; font-size: 13px; font-family: monospace; min-height: 20px; }
+    .error { color: var(--error); text-shadow: 0 0 10px rgba(244, 67, 54, 0.2); }
+    .info { color: rgba(255,255,255,0.4); }
 
-    /* Animations */
+    /* Animation Protocols */
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(1deg); }
     }
-    @keyframes holo {
-      0% { left: -100%; top: -100%; }
-      100% { left: 100%; top: 100%; }
+    @keyframes pulseGlow {
+      0%, 100% { width: 150px; opacity: 0.7; }
+      50% { width: 180px; opacity: 1; }
     }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0) scale(1.05); }
-      25% { transform: translateX(-5px) rotate(-2deg) scale(1.05); }
-      50% { transform: translateX(5px) rotate(2deg) scale(1.05); }
-      75% { transform: translateX(-5px) rotate(-2deg) scale(1.05); }
+    @keyframes holoStream {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
     }
-    @keyframes popIn {
-      0% { opacity: 0; transform: scale(0.5); }
-      100% { opacity: 1; transform: scale(1); }
+    @keyframes coreOverdrive {
+      0%, 100% { transform: translateX(0) scale(1.04); }
+      20% { transform: translateX(-3px) rotate(-1.5deg) scale(1.05); }
+      40% { transform: translateX(3px) rotate(1.5deg) scale(1.06); }
+      60% { transform: translateX(-4px) rotate(-1deg) scale(1.05); }
+      80% { transform: translateX(4px) rotate(2deg) scale(1.06); }
+    }
+    @keyframes cardManifest {
+      0% { opacity: 0; transform: scale(0.6) rotateX(-30deg); filter: brightness(3); }
+      100% { opacity: 1; transform: scale(1) rotateX(0deg); filter: brightness(1); }
     }
 
-    /* States added via JS */
+    /* Core Unlocking State Modifier */
     .pack.unlocking {
-      animation: shake 0.4s infinite;
-      box-shadow: 0 0 40px var(--primary);
+      animation: coreOverdrive 0.15s infinite;
+      box-shadow: 0 0 50px var(--primary);
       border-color: var(--primary);
     }
     .pack.error-shake {
-      animation: shake 0.4s 2;
-      box-shadow: 0 0 30px var(--error);
+      animation: coreOverdrive 0.3s 2;
+      box-shadow: 0 0 40px var(--error);
       border-color: var(--error);
     }
     .hidden { display: none !important; }
@@ -235,23 +362,29 @@
     <h2>Secure VIP Drop</h2>
     
     <div class="pack-container" id="pack-container">
+      <div class="pedestal-glow" id="pedestal"></div>
       <div class="pack" id="visual-pack">
-        <div class="pack-logo">CDC</div>
+        <div class="pack-overlay"></div>
+        <div class="pack-art">
+          <div class="pack-logo">CDC</div>
+        </div>
       </div>
     </div>
 
     <div class="reward-area" id="reward-area">
-      <h3 style="margin:0; color:#fff;">Drop Secured!</h3>
-      <img id="reward-img" class="reward-image" src="" alt="Reward Image">
-      <div id="reward-txt" class="reward-text"></div>
-      <p style="font-size:12px; color:#aaa;">Screenshot this and claim your drop.</p>
-      <button style="margin-top: 10px; width: 100%;" onclick="location.reload()">Scan Another Code</button>
+      <div class="loot-card">
+        <div class="rarity-tag">UNLOCKED</div>
+        <img id="reward-img" class="reward-image" src="" alt="Reward Image">
+        <div id="reward-txt" class="reward-text"></div>
+      </div>
+      <p style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom: 20px;">Take a snapshot to claim verification record.</p>
+      <button style="width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #fff; box-shadow: none;" onclick="location.reload()">Scan Next Sigil</button>
     </div>
 
     <div class="input-group" id="input-group">
       <input type="text" id="passcodeInput" placeholder="ENTER CODE" autocomplete="off" spellcheck="false">
       <button id="unlockBtn" onclick="processDecrypt()">Unlock Pack</button>
-      <div id="status-msg" class="info">Awaiting code input...</div>
+      <div id="status-msg" class="info">// SYS READY: Awaiting input matrix</div>
     </div>
   </div>
 
@@ -259,7 +392,6 @@
     // ==========================================
     // 1. CONFIGURATION
     // ==========================================
-    // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT URL HERE
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywuiVPzsb-R64Q9dfcmjfZ50_0l8_rta_3ERPjjW0YCN0YFRtPSTqSdBa2P0sv6eCf/exec";
 
     // ==========================================
@@ -269,49 +401,46 @@
       const codeInput = document.getElementById('passcodeInput').value.trim();
       const btn = document.getElementById('unlockBtn');
       const pack = document.getElementById('visual-pack');
+      const pedestal = document.getElementById('pedestal');
       const statusMsg = document.getElementById('status-msg');
 
       if (!codeInput) {
-        triggerError("NOPE");
+        triggerError("// ERROR: Crypt-key array empty.");
         return;
       }
 
-      // UI State: Unlocking
+      // UI State Transition
       btn.disabled = true;
-      btn.textContent = "SECURING DROP...";
+      btn.textContent = "INITIALIZING OPEN SEQUENCE...";
       statusMsg.className = "info";
-      statusMsg.textContent = "Stay on this screen...";
+      statusMsg.textContent = "// STATUS: Directing server handshake...";
       
-      // Stop floating, start shaking/glowing
       pack.style.animation = 'none'; 
-      // Trigger reflow
+      if (pedestal) pedestal.style.display = 'none';
       void pack.offsetWidth; 
       pack.classList.add('unlocking');
 
-      // Add artificial delay for suspense/animation impact
       const minimumDelay = new Promise(resolve => setTimeout(resolve, 2000));
 
       try {
-        // Fetch from Apps Script
         const fetchPromise = fetch(`${APPS_SCRIPT_URL}?code=${encodeURIComponent(codeInput)}`).then(res => res.json());
-        
-        // Wait for both the minimum delay (suspense) and the actual fetch to finish
         const [_, data] = await Promise.all([minimumDelay, fetchPromise]);
 
         if (data.status === "success") {
           showSuccess(data.reward);
         } else {
-          triggerError(data.message || "Invalid or already claimed code.");
+          triggerError(data.message || "// DECRYPTION FAILED: Code expired/voided.");
         }
       } catch (error) {
         console.error(error);
-        triggerError("Signal lost. Check connection or try again.");
+        triggerError("// TERMINAL ERR: Link array disrupted.");
       }
     }
 
     function triggerError(message) {
       const btn = document.getElementById('unlockBtn');
       const pack = document.getElementById('visual-pack');
+      const pedestal = document.getElementById('pedestal');
       const statusMsg = document.getElementById('status-msg');
 
       pack.classList.remove('unlocking');
@@ -323,10 +452,10 @@
       btn.disabled = false;
       btn.textContent = "TRY YOUR LUCK";
 
-      // Reset pack animation to float after error shakes
       setTimeout(() => {
         pack.classList.remove('error-shake');
         pack.style.animation = 'float 4s ease-in-out infinite';
+        if (pedestal) pedestal.style.display = 'block';
       }, 800);
     }
 
@@ -337,7 +466,6 @@
       const rewardArea = document.getElementById('reward-area');
       rewardArea.style.display = 'block';
 
-      // Check if the reward is a URL (Image) or standard Text
       const isImage = rewardData.startsWith('http://') || rewardData.startsWith('https://');
 
       if (isImage) {
@@ -354,7 +482,7 @@
     }
 
     // ==========================================
-    // 3. CONFETTI PARTICLE ENGINE
+    // 3. CONFETTI ENGINE
     // ==========================================
     function fireConfetti() {
       const canvas = document.getElementById('confetti-canvas');
@@ -363,23 +491,24 @@
       canvas.height = window.innerHeight;
 
       const particles = [];
-      const colors = ['#00ffcc', '#ff3366', '#ffffff', '#0099ff'];
+      const colors = ['#00f5ff', '#ffb703', '#ffffff', '#d946ef'];
 
       for (let i = 0; i < 150; i++) {
         particles.push({
           x: canvas.width / 2,
-          y: canvas.height / 2 + 100,
-          r: Math.random() * 6 + 2,
-          dx: Math.random() * 20 - 10,
-          dy: Math.random() * -20 - 5,
+          y: canvas.height / 2,
+          r: Math.random() * 5 + 2,
+          dx: Math.random() * 16 - 8,
+          dy: Math.random() * -18 - 4,
           color: colors[Math.floor(Math.random() * colors.length)],
           tilt: Math.floor(Math.random() * 10) - 10,
-          tiltAngleIncrement: (Math.random() * 0.07) + 0.05,
+          tiltAngleIncrement: (Math.random() * 0.07) + 0.04,
           tiltAngle: 0
         });
       }
 
       function animate() {
+        if(particles.length === 0) return;
         requestAnimationFrame(animate);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -387,7 +516,7 @@
           p.tiltAngle += p.tiltAngleIncrement;
           p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
           p.x += Math.sin(p.tiltAngle) * 2;
-          p.dy += 0.2; // gravity
+          p.dy += 0.22; 
           p.y += p.dy;
           p.x += p.dx;
 
@@ -398,18 +527,18 @@
           ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
           ctx.stroke();
 
-          // Remove particles that fall off screen
           if (p.y > canvas.height) particles.splice(index, 1);
         });
       }
       animate();
     }
 
-    // Handle window resize for confetti canvas
     window.addEventListener('resize', () => {
       const canvas = document.getElementById('confetti-canvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      if(canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
     });
   </script>
 </body>
