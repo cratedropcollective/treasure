@@ -380,6 +380,36 @@
     .tip-banner span { font-size: 14px; }
     .tip-banner.hidden { display: none; }
 
+    .warn-banner {
+      background: rgba(255,160,0,0.06); border: 1px solid rgba(255,160,0,0.3);
+      border-radius: 10px; padding: 12px 16px;
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 12px; color: rgba(255,190,50,0.9); line-height: 1.5;
+      animation: warnPulse 2s ease-in-out infinite;
+    }
+    @keyframes warnPulse { 0%,100%{border-color:rgba(255,160,0,0.3)} 50%{border-color:rgba(255,160,0,0.7)} }
+    .warn-banner span { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .warn-banner.hidden { display: none; }
+
+    /* Availability panel */
+    .avail-panel {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 18px;
+    }
+    .avail-title { font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 12px; }
+    .avail-rows { display: flex; flex-direction: column; gap: 9px; }
+    .avail-row { display: flex; align-items: center; gap: 10px; }
+    .avail-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .avail-name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.55); flex: 1; letter-spacing: 0.5px; }
+    .avail-count {
+      font-size: 12px; font-weight: 900; font-family: monospace;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      padding: 2px 10px; border-radius: 20px; color: rgba(255,255,255,0.7);
+      min-width: 36px; text-align: center;
+    }
+    .avail-count.zero { color: rgba(255,255,255,0.2); }
+    .avail-count.loading { color: rgba(255,255,255,0.2); }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -455,13 +485,31 @@
         <!-- Results -->
         <div class="booster-results">
           <div class="counter-row">
-            <div class="counter-chip">
+            <div class="counter-chip" style="flex:unset; width:auto; padding: 12px 20px;">
               <div class="val" id="packs-opened-count">0</div>
               <div class="lbl">Packs Opened</div>
             </div>
-            <div class="counter-chip">
-              <div class="val" id="codes-found-count">0</div>
-              <div class="lbl">Codes Found</div>
+          </div>
+
+          <!-- AVAILABILITY PANEL -->
+          <div class="avail-panel" id="avail-panel">
+            <div class="avail-title">Rewards Available</div>
+            <div class="avail-rows">
+              <div class="avail-row">
+                <span class="avail-dot" style="background:#ff2d6b"></span>
+                <span class="avail-name">Secret Rare</span>
+                <span class="avail-count" id="stock-secret-rare">—</span>
+              </div>
+              <div class="avail-row">
+                <span class="avail-dot" style="background:#d946ef"></span>
+                <span class="avail-name">Ultra Rare</span>
+                <span class="avail-count" id="stock-ultra-rare">—</span>
+              </div>
+              <div class="avail-row">
+                <span class="avail-dot" style="background:#00f5ff"></span>
+                <span class="avail-name">Super Rare</span>
+                <span class="avail-count" id="stock-super-rare">—</span>
+              </div>
             </div>
           </div>
 
@@ -472,6 +520,10 @@
           <div class="tip-banner" id="tip-banner">
             <span>💡</span>
             <div>Got a code? Scroll down to enter it in the terminal and unlock your drop.</div>
+          </div>
+          <div class="warn-banner hidden" id="warn-banner">
+            <span>⚠️</span>
+            <div><strong>Code pending!</strong> Redeem your code below before cracking another pack.</div>
           </div>
         </div>
 
@@ -528,12 +580,12 @@
   <script>
     // ── CONFIG ──
     // ── Replace both URLs with your deployed Apps Script URL ──
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEU51oaa6w5afYnKOOnk67rf2URcC8ldg0-NRtZ2c3bidvJOQVJEPQmqw1wbkbkmMZDQ/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEDvbtfhjG405oQeSAzee46VDzk-qbSNsYIV7EKEfB5f-lwoIZhkzcHTEX-o3r2VaV/exec";
 
     // ── STATE ──
     let isPulling = false;
     let packsOpened = 0;
-    let codesFound = 0;
+    let pendingCode = null; // track if a non-redeemed code is waiting — locks the pull btn
 
     // ── STEP SYSTEM ──
     function setStep(n) {
@@ -546,6 +598,65 @@
       });
       if (n > 1) document.getElementById('connector-1-2').classList.add('done');
       if (n > 2) document.getElementById('connector-2-3').classList.add('done');
+    }
+
+    // ── PULL BUTTON LOCK ──
+    function lockPullBtn() {
+      const btn = document.getElementById('pull-btn');
+      const wrap = document.getElementById('booster-wrap');
+      btn.disabled = true;
+      btn.textContent = 'Redeem code first ↓';
+      btn.style.background = 'linear-gradient(135deg,#2a1a00,#1a1000)';
+      btn.style.color = 'rgba(255,190,50,0.8)';
+      btn.style.border = '1px solid rgba(255,160,0,0.3)';
+      btn.style.boxShadow = 'none';
+      wrap.style.cursor = 'default';
+      wrap.onclick = null;
+      document.getElementById('warn-banner').classList.remove('hidden');
+      document.getElementById('tip-banner').classList.add('hidden');
+    }
+
+    function unlockPullBtn() {
+      const btn = document.getElementById('pull-btn');
+      const wrap = document.getElementById('booster-wrap');
+      pendingCode = null;
+      btn.disabled = false;
+      btn.textContent = 'Crack Another';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.border = '';
+      btn.style.boxShadow = '';
+      wrap.style.cursor = 'pointer';
+      wrap.onclick = simulatePull;
+      document.getElementById('warn-banner').classList.add('hidden');
+    }
+
+    // ── STOCK LOADER ──
+    async function loadStock() {
+      try {
+        const res = await fetch(`${APPS_SCRIPT_URL}?action=stock`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          updateStockDisplay(data.stock);
+        }
+      } catch(e) {
+        // silently fail — stock display just stays at dashes
+      }
+    }
+
+    function updateStockDisplay(stock) {
+      const map = {
+        'SECRET RARE': 'stock-secret-rare',
+        'ULTRA RARE':  'stock-ultra-rare',
+        'SUPER RARE':  'stock-super-rare'
+      };
+      for (const [rarity, elId] of Object.entries(map)) {
+        const el = document.getElementById(elId);
+        if (!el) continue;
+        const count = stock[rarity] ?? 0;
+        el.textContent = count === 0 ? 'SOLD OUT' : count;
+        el.className = 'avail-count' + (count === 0 ? ' zero' : '');
+      }
     }
 
     // ── RARITY COLOURS ──
@@ -641,8 +752,8 @@
             <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:4px">No code this time — better luck next pack.</div>
           `;
         } else {
-          codesFound++;
-          document.getElementById('codes-found-count').textContent = codesFound;
+          pendingCode = code;
+          lockPullBtn();
           pullResult.innerHTML = `
             <div class="result-label" style="color:${color}">${rarity}!</div>
             <div class="result-code" style="color:${color}" onclick="copyToUnlocker('${code}')">${code}</div>
@@ -654,13 +765,14 @@
           document.getElementById('tip-banner').classList.add('hidden');
         }
 
-        pullBtn.disabled = false;
-        pullBtn.textContent = 'Crack Another';
+        if (!pendingCode) {
+          unlockPullBtn();
+        }
+        // if pendingCode is set, button stays locked via lockPullBtn()
 
       } catch(e) {
         console.error('Pull error:', e);
-        pullBtn.disabled = false;
-        pullBtn.textContent = 'Crack Another';
+        unlockPullBtn();
       } finally {
         isPulling = false;
       }
@@ -795,6 +907,8 @@
 
         setStep(3);
         fireConfetti();
+        unlockPullBtn(); // allow cracking another pack after claiming
+        loadStock();     // refresh availability counts after redemption
       }, 350);
     }
 
@@ -852,8 +966,9 @@
       if (c) { c.width = window.innerWidth; c.height = window.innerHeight; }
     });
 
-    // Init step
+    // Init
     setStep(1);
+    loadStock();
   </script>
 </body>
 </html>
